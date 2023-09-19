@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const User = require("../models/user.model");
 const { hashPassword } = require("../utils/hashPassword");
+const { roles } = require("../utils/constants");
 
 module.exports = {
   registerUser: async (req, res, next) => {
@@ -20,7 +21,12 @@ module.exports = {
         return;
       }
       password = await hashPassword(password);
-      const user = new User({ email, password });
+      if(email === (process.env.ADMIN_EMAIL || "admin@gmail.com").toLowerCase() ) {
+        role = roles.admin;
+      } else {
+        role = roles.client;
+      }
+      const user = new User({ email, password, role });
       await user.save();
       req.flash('success', `${user.email} registered successfully, you can now login`);
       res.redirect('/auth/login');
