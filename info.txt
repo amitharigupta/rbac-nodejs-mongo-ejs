@@ -1,0 +1,6 @@
+
+To Work with Password we need 2 packages
+1. passport
+2. passport-local
+
+npm i passport passport-local
