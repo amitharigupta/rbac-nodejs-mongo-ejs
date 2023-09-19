@@ -11,8 +11,8 @@ router.get("/login", ensureLoggedOut({ redirectTo: '/' }), async (req, res, next
 });
 
 router.post("/login", ensureLoggedOut({ redirectTo: '/' }), passport.authenticate('local', {
-  successRedirect: "/user/profile",
-  // successReturnToOrRedirect: "/",
+  // successRedirect: "/user/profile",
+  successReturnToOrRedirect: "/",
   failureRedirect: "/auth/login",
   failureFlash: true
 }));
@@ -44,9 +44,11 @@ router.post(
   AuthController.registerUser
 );
 
-router.get("/logout", ensureLoggedIn({ redirectTo: '/' }), async (req, res, next) => {
-  req.logout();
-  res.redirect('/');
+router.get("/logout", ensureLoggedIn({ redirectTo: '/' }), (req, res, next) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
 });
 
 module.exports = router;
