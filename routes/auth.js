@@ -1,9 +1,9 @@
 var express = require("express");
 var router = express.Router();
 const AuthController = require("../controller/AuthController");
-const { body } = require("express-validator");
 const passport = require('passport');
 const { ensureLoggedOut, ensureLoggedIn } = require('connect-ensure-login');
+const { registerValidator } = require('../utils/validators');
 
 /* GET users listing. */
 router.get("/login", ensureLoggedOut({ redirectTo: '/' }), async (req, res, next) => {
@@ -23,24 +23,8 @@ router.get("/register", ensureLoggedOut({ redirectTo: '/' }), async (req, res, n
 
 router.post(
   "/register",
-  [
-    body("email")
-      .trim()
-      .isEmail()
-      .withMessage("Email must be a valid email")
-      .normalizeEmail()
-      .toLowerCase(),
-    body("password")
-      .trim()
-      .isLength(2)
-      .withMessage("Password length too short, min 2 char required"),
-    body("password2").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Password do not match");
-      }
-      return true;
-    }),
-  ],
+  ensureLoggedOut({ redirectTo: '/' }),
+  registerValidator,
   AuthController.registerUser
 );
 
